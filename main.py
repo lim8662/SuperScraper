@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, send_file
 from scraper import get_jobs
+from exporter import save_to_file
 app = Flask("SuperScraper")
 
 db = {}
@@ -11,6 +12,7 @@ def home():
 @app.route("/report")
 def report():
   word = request.args.get("word")
+
   if word:
     word = word.lower()
     
@@ -37,10 +39,13 @@ def export():
     jobs = db.get(word)
     if not jobs:
       raise Exception()
+    save_to_file(jobs)
 
-    return f"Generate CSV for {word}"
+    return send_file("jobs.csv")
   except:
     return redirect("/")
+
+
 
 app.run(host="0.0.0.0")
 
